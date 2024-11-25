@@ -110,6 +110,34 @@ const applications: NavItemType = {
       type: 'item',
       url: '/apps/manual-payments/manual-payments',
       icon: icons.add
+    },
+    {
+      id: 'create-admin',
+      title: <FormattedMessage id="Create Admin" />,
+      type: 'item',
+      url: '/apps/create-admin/create-admin',
+      icon: icons.add
+    },
+    {
+      id: 'BursaryApplicationList',
+      title: <FormattedMessage id="Bursary Application List" />,
+      type: 'item',
+      url: '/apps/BursaryApplicationList/BursaryApplicationList',
+      icon: icons.add
+    },
+    {
+      id: 'EventRegistrationList',
+      title: <FormattedMessage id="Event Registration List" />,
+      type: 'item',
+      url: '/apps/EventRegistrationList/EventRegistrationList',
+      icon: icons.add
+    },
+    {
+      id: 'studentMarkList',
+      title: <FormattedMessage id="Student Mark List" />,
+      type: 'item',
+      url: '/apps/studentMarkList/studentMarkList',
+      icon: icons.add
     }
   ]
 };
