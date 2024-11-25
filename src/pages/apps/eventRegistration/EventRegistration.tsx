@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios, { AxiosError, isAxiosError } from 'axios'; // Corrected import
+import axios from 'utils/axios'; // Corrected import
 import { SelectChangeEvent } from '@mui/material'; // Import SelectChangeEvent
 
 // Material-UI Components
@@ -91,13 +91,6 @@ const EventRegistrationList: React.FC = () => {
         }
       } catch (err: unknown) {
         console.error('Error fetching event registrations:', err);
-        if (isAxiosError(err)) {
-          setError(err.response?.data?.message || 'Failed to fetch event registrations.');
-        } else if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An unexpected error occurred.');
-        }
       } finally {
         setLoading(false);
       }
