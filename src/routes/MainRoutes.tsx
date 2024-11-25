@@ -32,7 +32,7 @@ const Calendar = Loadable(lazy(() => import('pages/apps/calendar')));
 const CreateAdmin = Loadable(lazy(() => import('pages/apps/createAdmin/CreateAdmin')));
 const ListBursaryApplication = Loadable(lazy(() => import('pages/apps/bursayapplicaiton/BursaryApplicationList')));
 const EventRegistrationList = Loadable(lazy(() => import('pages/apps/eventRegistration/EventRegistration')));
-const StudentMarkList = Loadable(lazy(() => import('pages/apps/studentMarkList/studentMarkList')));
+const StudentMarkList = Loadable(lazy(() => import('pages/apps/studentMarkList/StudentMarkList')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 

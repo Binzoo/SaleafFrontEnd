@@ -1,8 +1,9 @@
-// EventRegistrationList.jsx
+// EventRegistration.tsx
 
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'utils/axios';
+import axios, { AxiosError, isAxiosError } from 'axios'; // Corrected import
+import { SelectChangeEvent } from '@mui/material'; // Import SelectChangeEvent
 
 // Material-UI Components
 import {
@@ -43,7 +44,7 @@ interface EventRegistration {
   paymentId: string;
   eventName: string;
   registrationDate: string;
-  pacakageName: string;
+  packageName: string; // Corrected typo from 'pacakageName' to 'packageName'
   amount: number;
   isPaid: boolean;
 }
@@ -56,10 +57,11 @@ interface ApiResponse {
   data: EventRegistration[];
 }
 
-const EventRegistrationList = () => {
+const EventRegistrationList: React.FC = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
 
+  // State variables with explicit types
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -87,9 +89,15 @@ const EventRegistrationList = () => {
         } else {
           throw new Error(`Unexpected response status: ${response.status}`);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching event registrations:', err);
-        setError(err.message || 'Failed to fetch event registrations.');
+        if (isAxiosError(err)) {
+          setError(err.response?.data?.message || 'Failed to fetch event registrations.');
+        } else if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred.');
+        }
       } finally {
         setLoading(false);
       }
@@ -98,20 +106,25 @@ const EventRegistrationList = () => {
     fetchRegistrations();
   }, [pageNumber, pageSize, searchQuery, token]);
 
-  const handlePageChange = (event: ChangeEvent<unknown>, value: number) => {
+  // Handler for page change
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPageNumber(value);
   };
 
-  const handlePageSizeChange = (event: ChangeEvent<{ value: unknown }>) => {
-    setPageSize(event.target.value as number);
+  // Handler for page size change
+  const handlePageSizeChange = (event: SelectChangeEvent<string>) => {
+    // Corrected type
+    setPageSize(Number(event.target.value)); // Convert string to number
     setPageNumber(1); // Reset to first page when page size changes
   };
 
+  // Handler for search input change
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
     setPageNumber(1); // Reset to first page on new search
   };
 
+  // Handler to view registration details
   const handleViewDetails = (id: string) => {
     navigate(`/event-registration/details/${id}`);
   };
@@ -130,9 +143,11 @@ const EventRegistrationList = () => {
       </Backdrop>
 
       <Grid container spacing={3} sx={{ padding: '20px' }}>
+        {/* Header and Add Button */}
         <Grid item xs={12}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography variant="h4">Event Registrations</Typography>
+            {/* You can add an "Add" button here if needed */}
           </Stack>
         </Grid>
 
@@ -182,7 +197,7 @@ const EventRegistrationList = () => {
                       <TableCell>{registration.userName}</TableCell>
                       <TableCell>{registration.eventName}</TableCell>
                       <TableCell>{new Date(registration.registrationDate).toLocaleDateString()}</TableCell>
-                      <TableCell>{registration.pacakageName}</TableCell>
+                      <TableCell>{registration.packageName}</TableCell>
                       <TableCell>{`R ${registration.amount.toFixed(2)}`}</TableCell>
                       <TableCell>
                         {registration.isPaid ? <Typography color="green">Paid</Typography> : <Typography color="red">Unpaid</Typography>}
@@ -211,14 +226,14 @@ const EventRegistrationList = () => {
                 <Select
                   labelId="page-size-label"
                   id="page-size-select"
-                  value={pageSize}
+                  value={pageSize.toString()} // Ensure the value is a string
                   onChange={handlePageSizeChange}
                   label="Items per page"
                 >
-                  <MenuItem value={5}>5</MenuItem>
-                  <MenuItem value={10}>10</MenuItem>
-                  <MenuItem value={20}>20</MenuItem>
-                  <MenuItem value={50}>50</MenuItem>
+                  <MenuItem value="5">5</MenuItem>
+                  <MenuItem value="10">10</MenuItem>
+                  <MenuItem value="20">20</MenuItem>
+                  <MenuItem value="50">50</MenuItem>
                 </Select>
               </FormControl>
 

@@ -1,8 +1,9 @@
-// StudentMarkUploadList.jsx
+// StudentMarkUploadList.tsx
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'utils/axios';
+import axios, { AxiosError, isAxiosError } from 'axios'; // Corrected import
+import { SelectChangeEvent } from '@mui/material'; // Import SelectChangeEvent
 
 // Material-UI Components
 import {
@@ -32,17 +33,27 @@ import { Visibility } from '@mui/icons-material';
 // Auth Hook
 import useAuth from 'hooks/useAuth';
 
-const StudentMarkUploadList = () => {
+// Define interface for StudentMarkUpload
+interface StudentMarkUpload {
+  id: number;
+  name: string;
+  type: string;
+  uploadDate: string; // ISO date string
+  fileUrl: string;
+}
+
+const StudentMarkUploadList: React.FC = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
 
-  const [uploads, setUploads] = useState([]);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  // State variables with explicit types
+  const [uploads, setUploads] = useState<StudentMarkUpload[]>([]);
+  const [totalRecords, setTotalRecords] = useState<number>(0);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const fetchUploads = async () => {
@@ -57,15 +68,21 @@ const StudentMarkUploadList = () => {
 
         if (response.status === 200) {
           const data = response.data;
-          setUploads(data.uploads);
-          setTotalRecords(data.totalRecords);
-          setTotalPages(data.totalPages);
+          setUploads(data.uploads as StudentMarkUpload[]);
+          setTotalRecords(data.totalRecords as number);
+          setTotalPages(data.totalPages as number);
         } else {
           throw new Error(`Unexpected response status: ${response.status}`);
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error fetching student mark uploads:', err);
-        setError(err.response?.data?.message || 'Failed to fetch student mark uploads.');
+        if (isAxiosError(err)) {
+          setError(err.response?.data?.message || 'Failed to fetch student mark uploads.');
+        } else if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred.');
+        }
       } finally {
         setLoading(false);
       }
@@ -74,16 +91,20 @@ const StudentMarkUploadList = () => {
     fetchUploads();
   }, [pageNumber, pageSize, token]);
 
-  const handlePageChange = (event, value) => {
+  // Handler for page change
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPageNumber(value);
   };
 
-  const handlePageSizeChange = (event) => {
-    setPageSize(event.target.value);
+  // Handler for page size change
+  const handlePageSizeChange = (event: SelectChangeEvent<string>) => {
+    // Corrected type
+    setPageSize(Number(event.target.value)); // Parse string to number
     setPageNumber(1);
   };
 
-  const handleViewFile = (fileUrl) => {
+  // Handler to view file
+  const handleViewFile = (fileUrl: string) => {
     window.open(fileUrl, '_blank');
   };
 
@@ -104,6 +125,7 @@ const StudentMarkUploadList = () => {
         <Grid item xs={12}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography variant="h4">Student Mark Uploads</Typography>
+            {/* You can add an "Add" button here if needed */}
           </Stack>
         </Grid>
 
@@ -126,14 +148,14 @@ const StudentMarkUploadList = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {uploads.map((upload) => (
+                  {uploads.map((upload: StudentMarkUpload) => (
                     <TableRow key={upload.id}>
                       <TableCell>{upload.id}</TableCell>
                       <TableCell>{upload.name}</TableCell>
                       <TableCell>{upload.type}</TableCell>
                       <TableCell>{new Date(upload.uploadDate).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        <Button variant="outlined" size="small" onClick={() => handleViewFile(upload.fileUrl)}>
+                        <Button variant="outlined" size="small" onClick={() => handleViewFile(upload.fileUrl)} startIcon={<Visibility />}>
                           View File
                         </Button>
                       </TableCell>
@@ -156,14 +178,14 @@ const StudentMarkUploadList = () => {
                 <Select
                   labelId="page-size-label"
                   id="page-size-select"
-                  value={pageSize}
+                  value={pageSize.toString()} // Ensure the value is a string
                   onChange={handlePageSizeChange}
                   label="Items per page"
                 >
-                  <MenuItem value={5}>5</MenuItem>
-                  <MenuItem value={10}>10</MenuItem>
-                  <MenuItem value={20}>20</MenuItem>
-                  <MenuItem value={50}>50</MenuItem>
+                  <MenuItem value="5">5</MenuItem>
+                  <MenuItem value="10">10</MenuItem>
+                  <MenuItem value="20">20</MenuItem>
+                  <MenuItem value="50">50</MenuItem>
                 </Select>
               </FormControl>
 

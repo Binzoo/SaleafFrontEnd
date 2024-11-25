@@ -1,11 +1,114 @@
-// BursaryApplicationList.jsx
-
 import React, { useEffect, useState } from 'react';
 
+// Define interfaces
+interface FinancialDetail {
+  role: string;
+  fullName: string;
+  saidNumber: string;
+  occupation: string;
+  maritalStatus: string;
+  grossMonthlyIncome: number;
+  otherIncome: number;
+}
+
+interface Dependent {
+  fullName: string;
+  relationshipToApplicant: string;
+  age: number;
+  institutionName: string;
+}
+
+interface FixedProperty {
+  physicalAddress: string;
+  erfNoTownship: string;
+  datePurchased: string;
+  purchasePrice: number;
+  municipalValue: number;
+  presentValue: number;
+}
+
+interface Vehicle {
+  makeModelYear: string;
+  registrationNumber: string;
+  presentValue: number;
+}
+
+interface Investment {
+  company: string;
+  description: string;
+  marketValue: number;
+}
+
+interface OtherAsset {
+  description: string;
+  value: number;
+}
+
+interface Liability {
+  description: string;
+  amount: number;
+}
+
+interface BursaryApplication {
+  name: string;
+  surname: string;
+  dateOfBirth: string;
+  saidNumber: string;
+  placeOfBirth: string;
+  email: string;
+  contactNumber: string;
+  homePhysicalAddress: string;
+  homePostalAddress: string;
+  institutionAppliedFor: string;
+  degreeOrDiploma: string;
+  yearOfStudyAndCommencement: string;
+  studentNumber: string;
+  approximateFundingRequired: number;
+  tertiarySubjectsAndResultsUrl: string;
+  grade12SubjectsAndResultsUrl: string;
+  grade11SubjectsAndResultsUrl: string;
+  financialDetailsList: FinancialDetail[];
+  dependents: Dependent[];
+  fixedProperties: FixedProperty[];
+  vehicles: Vehicle[];
+  investments: Investment[];
+  jewelleryValue: number;
+  furnitureAndFittingsValue: number;
+  equipmentValue: number;
+  otherAssets: OtherAsset[];
+  overdrafts: number;
+  unsecuredLoans: number;
+  creditCardDebts: number;
+  incomeTaxDebts: number;
+  otherLiabilities: Liability[];
+  declarationSignedBy: string;
+  declarationDate: string;
+}
+
+// Define props interfaces
+interface ApplicationCardProps {
+  application: BursaryApplication;
+}
+
+interface SectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+interface SubSectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+interface DetailProps {
+  label: string;
+  value: React.ReactNode;
+}
+
 export default function BursaryApplicationList() {
-  const [applications, setApplications] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [applications, setApplications] = useState<BursaryApplication[]>([]);
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -22,10 +125,14 @@ export default function BursaryApplicationList() {
           throw new Error('Failed to fetch data');
         }
 
-        const data = await response.json();
+        const data: BursaryApplication[] = await response.json();
         setApplications(data);
-      } catch (error) {
-        setError(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError('An unexpected error occurred.');
+        }
       } finally {
         setLoading(false);
       }
@@ -54,35 +161,10 @@ export default function BursaryApplicationList() {
   );
 }
 
-function ApplicationCard({ application }) {
-  const [expanded, setExpanded] = useState(false);
-  const [message, setMessage] = useState('');
-  const [accepted, setAccepted] = useState(false);
+function ApplicationCard({ application }: ApplicationCardProps) {
+  const [expanded, setExpanded] = useState<boolean>(false);
 
   const toggleExpanded = () => setExpanded(!expanded);
-
-  const handleAccept = async () => {
-    const userId = application.appUserId;
-    try {
-      const response = await fetch(`https://saleafapi-production.up.railway.app/api/Account/assign-role/${userId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer your_token_here' // Replace with your actual token
-        },
-        body: JSON.stringify({ role: 'student' })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to assign role');
-      }
-
-      setMessage('Bursary accepted and role assigned successfully.');
-      setAccepted(true);
-    } catch (error) {
-      setMessage(`Error: ${error.message}`);
-    }
-  };
 
   return (
     <div style={styles.card}>
@@ -145,7 +227,7 @@ function ApplicationCard({ application }) {
 
           {/* Financial Details */}
           <Section title="Financial Details">
-            {application.financialDetailsList.map((detail, index) => (
+            {application.financialDetailsList.map((detail: FinancialDetail, index: number) => (
               <div key={index} style={styles.subSection}>
                 <h4 style={styles.subSectionTitle}>{detail.role}</h4>
                 <Detail label="Full Name" value={detail.fullName} />
@@ -160,7 +242,7 @@ function ApplicationCard({ application }) {
 
           {/* Dependents */}
           <Section title="Dependents">
-            {application.dependents.map((dependent, index) => (
+            {application.dependents.map((dependent: Dependent, index: number) => (
               <div key={index} style={styles.subSection}>
                 <Detail label="Full Name" value={dependent.fullName} />
                 <Detail label="Relationship" value={dependent.relationshipToApplicant} />
@@ -174,11 +256,11 @@ function ApplicationCard({ application }) {
           <Section title="Assets">
             {/* Fixed Properties */}
             <SubSection title="Fixed Properties">
-              {application.fixedProperties.map((property, index) => (
+              {application.fixedProperties.map((property: FixedProperty, index: number) => (
                 <div key={index} style={styles.subSectionItem}>
                   <Detail label="Physical Address" value={property.physicalAddress} />
                   <Detail label="ERF No/Township" value={property.erfNoTownship} />
-                  <Detail label="Date Purchased" value={property.datePurchased} />
+                  <Detail label="Date Purchased" value={new Date(property.datePurchased).toLocaleDateString()} />
                   <Detail label="Purchase Price" value={`R ${property.purchasePrice}`} />
                   <Detail label="Municipal Value" value={`R ${property.municipalValue}`} />
                   <Detail label="Present Value" value={`R ${property.presentValue}`} />
@@ -188,7 +270,7 @@ function ApplicationCard({ application }) {
 
             {/* Vehicles */}
             <SubSection title="Vehicles">
-              {application.vehicles.map((vehicle, index) => (
+              {application.vehicles.map((vehicle: Vehicle, index: number) => (
                 <div key={index} style={styles.subSectionItem}>
                   <Detail label="Make/Model/Year" value={vehicle.makeModelYear} />
                   <Detail label="Registration Number" value={vehicle.registrationNumber} />
@@ -199,7 +281,7 @@ function ApplicationCard({ application }) {
 
             {/* Investments */}
             <SubSection title="Investments">
-              {application.investments.map((investment, index) => (
+              {application.investments.map((investment: Investment, index: number) => (
                 <div key={index} style={styles.subSectionItem}>
                   <Detail label="Company" value={investment.company} />
                   <Detail label="Description" value={investment.description} />
@@ -212,7 +294,7 @@ function ApplicationCard({ application }) {
             <Detail label="Jewellery Value" value={`R ${application.jewelleryValue}`} />
             <Detail label="Furniture and Fittings Value" value={`R ${application.furnitureAndFittingsValue}`} />
             <Detail label="Equipment Value" value={`R ${application.equipmentValue}`} />
-            {application.otherAssets.map((asset, index) => (
+            {application.otherAssets.map((asset: OtherAsset, index: number) => (
               <div key={index} style={styles.subSectionItem}>
                 <Detail label="Description" value={asset.description} />
                 <Detail label="Value" value={`R ${asset.value}`} />
@@ -226,7 +308,7 @@ function ApplicationCard({ application }) {
             <Detail label="Unsecured Loans" value={`R ${application.unsecuredLoans}`} />
             <Detail label="Credit Card Debts" value={`R ${application.creditCardDebts}`} />
             <Detail label="Income Tax Debts" value={`R ${application.incomeTaxDebts}`} />
-            {application.otherLiabilities.map((liability, index) => (
+            {application.otherLiabilities.map((liability: Liability, index: number) => (
               <div key={index} style={styles.subSectionItem}>
                 <Detail label="Description" value={liability.description} />
                 <Detail label="Amount" value={`R ${liability.amount}`} />
@@ -239,21 +321,13 @@ function ApplicationCard({ application }) {
             <Detail label="Declaration Signed By" value={application.declarationSignedBy} />
             <Detail label="Declaration Date" value={new Date(application.declarationDate).toLocaleDateString()} />
           </Section>
-
-          {/* Accept Button */}
-          {!accepted && (
-            <button style={styles.acceptButton} onClick={handleAccept}>
-              Accept Application
-            </button>
-          )}
-          {message && <p style={styles.message}>{message}</p>}
         </div>
       )}
     </div>
   );
 }
 
-function Section({ title, children }) {
+function Section({ title, children }: SectionProps) {
   return (
     <div style={styles.section}>
       <h3 style={styles.sectionTitle}>{title}</h3>
@@ -262,7 +336,7 @@ function Section({ title, children }) {
   );
 }
 
-function SubSection({ title, children }) {
+function SubSection({ title, children }: SubSectionProps) {
   return (
     <div style={styles.subSection}>
       <h4 style={styles.subSectionTitle}>{title}</h4>
@@ -271,7 +345,7 @@ function SubSection({ title, children }) {
   );
 }
 
-function Detail({ label, value }) {
+function Detail({ label, value }: DetailProps) {
   return (
     <div style={styles.detail}>
       <strong>{label}:</strong> {value}
@@ -279,7 +353,7 @@ function Detail({ label, value }) {
   );
 }
 
-const styles = {
+const styles: { [key: string]: React.CSSProperties } = {
   container: {
     padding: '20px',
     fontFamily: 'Arial, sans-serif'
@@ -353,18 +427,5 @@ const styles = {
   },
   detail: {
     marginBottom: '5px'
-  },
-  acceptButton: {
-    padding: '10px 20px',
-    backgroundColor: '#28a745', // Green color
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginTop: '20px'
-  },
-  message: {
-    marginTop: '10px',
-    color: '#28a745' // Green color for success message
   }
 };
