@@ -234,9 +234,9 @@ const DonationPage: React.FC = () => {
           const response = await axiosServices.post('/api/Donation', {
             amount: formik.values.donationAmount,
             currency: 'ZAR',
-            cancelUrl: `${window.location.origin}${BASE_URL}/donate?status=cancelled`,
-            successUrl: `${window.location.origin}${BASE_URL}/donate?status=success`,
-            failureUrl: `${window.location.origin}${BASE_URL}/donate?status=failed`,
+            cancelUrl: `${window.location.origin}/donate?status=cancelled`,
+            successUrl: `${window.location.origin}/donate?status=success`,
+            failureUrl: `${window.location.origin}/donate?status=failed`,
             isAnonymous: false
           });
           const data = await response.data;
