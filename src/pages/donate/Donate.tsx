@@ -68,7 +68,7 @@ const DonationPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const BASE_URL = '/SALEAF';
+  const BASE_URL = '/';
 
   const steps = ['Choose Amount', 'Donor Information', 'Payment Method', 'Process Payment', 'Confirmation'];
   const predefinedAmounts = [50, 100, 1000, 5000];
