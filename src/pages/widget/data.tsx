@@ -12,7 +12,6 @@ import MonthlyRevenue from 'sections/widget/data/MonthlyRevenue';
 import NewCustomers from 'sections/widget/data/NewCustomers';
 import RecentTickets from 'sections/widget/data/RecentTickets';
 
-import Transactions from 'sections/widget/data/Transactions';
 import PaymentHistory from 'sections/widget/data/PaymentHistory';
 import AddTask from 'sections/widget/data/AddTask';
 
@@ -22,7 +21,6 @@ import TrafficSources from 'sections/widget/data/TrafficSources';
 import UserActivity from 'sections/widget/data/UserActivity';
 import LatestMessages from 'sections/widget/data/LatestMessages';
 
-import ProjectTable from 'sections/widget/data/ProjectTable';
 import ProductSales from 'sections/widget/data/ProductSales';
 
 import TasksCard from 'sections/widget/data/TasksCard';
@@ -112,10 +110,6 @@ export default function WidgetData() {
         <UserActivity />
       </Grid>
 
-      {/* row 3 */}
-      <Grid item xs={12} lg={6} md={6}>
-        <ProjectTable />
-      </Grid>
       <Grid item xs={12} lg={6} md={6}>
         <ProductSales />
       </Grid>

@@ -1,9 +1,8 @@
 import React from 'react';
-import { Card, Typography } from '@mui/material';
+import { Card, Typography, Box, Divider, useTheme, alpha } from '@mui/material';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { useTheme } from '@mui/material/styles';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
-// Define TypeScript interfaces
 interface MonthlyDonation {
   year: number;
   month: number;
@@ -17,51 +16,136 @@ interface TotalIncomeProps {
 const TotalIncome: React.FC<TotalIncomeProps> = ({ monthlyDonations }) => {
   const theme = useTheme();
 
-  // Prepare data for the chart
-  const chartData = monthlyDonations
-    .sort((a, b) => {
-      if (a.year === b.year) {
-        return a.month - b.month;
-      }
-      return a.year - b.year;
-    })
-    .map((donation) => ({
-      name: `${getMonthName(donation.month)}/${donation.year}`,
-      Income: donation.totalEarnings
-    }));
+  // Function to fill in missing months
+  const fillMissingMonths = (donations: MonthlyDonation[]): MonthlyDonation[] => {
+    if (donations.length === 0) return [];
 
-  // Helper function to convert month number to month name
+    const year = donations[0].year;
+    const filledData: MonthlyDonation[] = [];
+
+    // Create array for all 12 months
+    for (let month = 1; month <= 12; month++) {
+      const existingDonation = donations.find((d) => d.month === month && d.year === year);
+      filledData.push({
+        year,
+        month,
+        totalEarnings: existingDonation ? existingDonation.totalEarnings : 0
+      });
+    }
+
+    return filledData;
+  };
+
   function getMonthName(monthNumber: number): string {
     const date = new Date();
     date.setMonth(monthNumber - 1);
     return date.toLocaleString('default', { month: 'short' });
   }
 
+  // Calculate some statistics
+  const filledMonthlyDonations = fillMissingMonths(monthlyDonations);
+  const totalEarnings = getTotalEarnings(monthlyDonations);
+  const averageMonthly = totalEarnings / monthlyDonations.length;
+
+  const chartData = filledMonthlyDonations
+    .sort((a, b) => a.month - b.month)
+    .map((donation) => ({
+      name: `${getMonthName(donation.month)}`,
+      Income: donation.totalEarnings,
+      Average: averageMonthly
+    }));
+
+  // Custom tooltip
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <Box
+          sx={{
+            backgroundColor: theme.palette.background.paper,
+            p: 2,
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: 1,
+            boxShadow: theme.shadows[3]
+          }}
+        >
+          <Typography variant="subtitle2" color="textSecondary">
+            {label} {filledMonthlyDonations[0].year}
+          </Typography>
+          <Typography variant="body1" fontWeight="bold" color="primary">
+            Income: R{payload[0].value.toLocaleString()}
+          </Typography>
+        </Box>
+      );
+    }
+    return null;
+  };
+
   return (
-    <Card sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        Total Income
-      </Typography>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip formatter={(value: number) => [`R${value.toLocaleString()}`, 'Income']} />
-          <Bar dataKey="Income" fill={theme.palette.primary.main} />
-        </BarChart>
-      </ResponsiveContainer>
-      <Typography variant="h5" align="right" mt={2}>
-        {`R${getTotalEarnings(monthlyDonations).toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        })}`}
-      </Typography>
+    <Card
+      elevation={0}
+      sx={{
+        border: `1px solid ${theme.palette.divider}`,
+        height: '100%'
+      }}
+    >
+      <Box sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+          <TrendingUpIcon color="primary" />
+          <Typography variant="h6" fontWeight="600">
+            Total Income
+          </Typography>
+        </Box>
+
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+            <defs>
+              <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0.2} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.5)} vertical={false} />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: theme.palette.text.secondary, fontSize: 12 }} />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
+              tickFormatter={(value) => `R${value.toLocaleString()}`}
+            />
+            <Tooltip content={CustomTooltip} />
+            <Bar dataKey="Income" fill="url(#incomeGradient)" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <Box>
+            <Typography variant="body2" color="textSecondary">
+              Total Earnings
+            </Typography>
+            <Typography variant="h4" fontWeight="700" color="primary">
+              R{totalEarnings.toLocaleString()}
+            </Typography>
+          </Box>
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography variant="body2" color="textSecondary">
+              Monthly Average
+            </Typography>
+            <Typography variant="h6" fontWeight="600" color="text.secondary">
+              R
+              {averageMonthly.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
     </Card>
   );
 };
 
-// Helper function to calculate total earnings
 function getTotalEarnings(monthlyDonations: MonthlyDonation[]): number {
   return monthlyDonations.reduce((acc, donation) => acc + donation.totalEarnings, 0);
 }

@@ -1,6 +1,7 @@
 import { useState, cloneElement, ReactElement, MouseEvent } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
+import logoimg from '../../assets/images/SaleafClear.png';
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -28,7 +29,6 @@ import Dot from 'components/@extended/Dot';
 import Logo from 'components/logo';
 import { handlerComponentDrawer, useGetMenuMaster } from 'api/menu';
 import { useIspValue } from 'hooks/useIspValue';
-import { techData } from 'data/tech-data';
 
 // assets
 import {
@@ -86,7 +86,7 @@ export default function Header({ layout = 'landing', ...others }: Props) {
   const [openDrawer, setOpenDrawer] = useState(false);
 
   const { menuMaster } = useGetMenuMaster();
-
+  const { user } = useAuth();
   /** Method called on multiple components with different event types */
   const drawerToggler = (open: boolean) => (event: any) => {
     if (event.type! === 'keydown' && (event.key! === 'Tab' || event.key! === 'Shift')) {
@@ -96,25 +96,7 @@ export default function Header({ layout = 'landing', ...others }: Props) {
   };
   const ispValueAvailable = useIspValue();
 
-  const url = ispValueAvailable ? 'https://1.envato.market/OrJ5nn' : 'https://1.envato.market/zNkqj6';
-
-  const MobileMenuListItem = techData.map((item, index) => {
-    const finalUrl = item.url !== '#!' && ispValueAvailable ? `${item.url}?isp=1` : item.url;
-    return (
-      <ListItemButton
-        key={index}
-        component={item.label === 'React MUI' ? RouterLink : 'a'}
-        {...(item.label === 'React MUI' ? { to: finalUrl } : { href: finalUrl })}
-        target={item.target}
-        sx={{ p: 0 }}
-      >
-        <ListItemIcon>
-          <Dot size={4} color="secondary" />
-        </ListItemIcon>
-        <ListItemText primary={item.label} primaryTypographyProps={{ variant: 'h6', color: 'secondary.main' }} />
-      </ListItemButton>
-    );
-  });
+  const userRole = user?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
 
   return (
     <ElevationScroll layout={layout} {...others}>
@@ -130,7 +112,7 @@ export default function Header({ layout = 'landing', ...others }: Props) {
           <Toolbar sx={{ px: { xs: 1.5, sm: 4, md: 0, lg: 0 }, py: 1 }}>
             <Stack direction="row" sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }} alignItems="center">
               <Typography sx={{ textAlign: 'left', display: 'inline-block' }}>
-                <Logo to="/" />
+                <img src={logoimg} alt="Company Logo" style={{ width: '20%' }} />
               </Typography>
             </Stack>
             <Stack
@@ -170,6 +152,17 @@ export default function Header({ layout = 'landing', ...others }: Props) {
               >
                 Application Form
               </Link>
+              {userRole === 'Admin' && (
+                <Link
+                  className="header-link"
+                  color="secondary.main"
+                  component={RouterLink}
+                  to={ispValueAvailable ? '/dashboard/default' : '/dashboard/default'}
+                  underline="none"
+                >
+                  Dashboard
+                </Link>
+              )}
 
               {isLoggedIn ? (
                 <IconButton
@@ -232,7 +225,7 @@ export default function Header({ layout = 'landing', ...others }: Props) {
               }}
             >
               <Typography sx={{ textAlign: 'left', display: 'inline-block' }}>
-                <Logo to="/" />
+                <img src={logoimg} alt="Company Logo" style={{ width: '20%' }} />
               </Typography>
               <Stack direction="row" spacing={2}>
                 <IconButton
@@ -273,7 +266,7 @@ export default function Header({ layout = 'landing', ...others }: Props) {
                       </ListItemButton>
                     </Link>
 
-                    <Link style={{ textDecoration: 'none' }} href="/SALEAF/donate">
+                    <Link style={{ textDecoration: 'none' }} href="/donate">
                       <ListItemButton>
                         <ListItemIcon>
                           <Money color={theme.palette.secondary.main} />
@@ -281,7 +274,7 @@ export default function Header({ layout = 'landing', ...others }: Props) {
                         <ListItemText primary="Donate" primaryTypographyProps={{ variant: 'h6', color: 'secondary.main' }} />
                       </ListItemButton>
                     </Link>
-                    <Link style={{ textDecoration: 'none' }} href="/SALEAF/Application_Form">
+                    <Link style={{ textDecoration: 'none' }} href="/Application_Form">
                       <ListItemButton>
                         <ListItemIcon>
                           <Document color={theme.palette.secondary.main} />
@@ -347,9 +340,6 @@ export default function Header({ layout = 'landing', ...others }: Props) {
                         </ListItem>
                       </>
                     )}
-                    <Collapse in={openDrawer} timeout="auto" unmountOnExit>
-                      {openDrawer && <List sx={{ p: 0, pl: 6, '& .MuiListItemIcon-root': { minWidth: 20 } }}>{MobileMenuListItem}</List>}
-                    </Collapse>
                   </List>
                 </Box>
               </Drawer>

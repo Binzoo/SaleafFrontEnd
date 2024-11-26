@@ -13,6 +13,7 @@ import AddDirectors from 'pages/apps/directors/AddDirectors';
 // import ListDirectors from 'pages/apps/directors/ListDirectors';
 import ListDonations from 'pages/apps/donations/ListDonations';
 import { Path } from '@react-pdf/renderer';
+import AuthGuard from 'utils/route-guard/AuthGuard';
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
@@ -42,7 +43,11 @@ const MainRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardLayout />,
+      element: (
+        <AuthGuard>
+          <DashboardLayout />
+        </AuthGuard>
+      ),
       children: [
         {
           path: 'dashboard',

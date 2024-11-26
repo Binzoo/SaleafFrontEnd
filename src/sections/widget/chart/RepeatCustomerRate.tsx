@@ -38,8 +38,6 @@ export default function RepeatCustomerRate({ monthlyDonations }: RepeatCustomerR
   };
 
   // Calculate percentage change or any other logic if needed
-  const percentage = 5.44;
-  const percentageChange = 2.6;
 
   return (
     <MainCard>
