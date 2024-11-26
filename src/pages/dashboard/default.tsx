@@ -174,7 +174,6 @@ const StyledStatCard: React.FC<StyledStatCardProps> = ({ title, value, icon: Ico
               }}
             >
               {trend > 0 ? '+' : ''}
-              {trend}%
             </Typography>
           )}
         </Box>

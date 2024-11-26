@@ -365,7 +365,6 @@ const EventList = () => {
     ],
     [navigate]
   );
-  let breadcrumbLinks = [{ title: 'Home', to: APP_DEFAULT_PATH }, { title: 'Event List' }];
 
   return (
     <>
