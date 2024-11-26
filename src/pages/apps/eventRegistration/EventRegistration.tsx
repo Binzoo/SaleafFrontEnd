@@ -44,7 +44,7 @@ interface EventRegistration {
   paymentId: string;
   eventName: string;
   registrationDate: string;
-  packageName: string; // Corrected typo from 'pacakageName' to 'packageName'
+  pacakageName: string; // Corrected typo from 'pacakageName' to 'packageName'
   amount: number;
   isPaid: boolean;
 }
@@ -180,7 +180,6 @@ const EventRegistrationList: React.FC = () => {
                     <TableCell>Package Name</TableCell>
                     <TableCell>Amount</TableCell>
                     <TableCell>Payment Status</TableCell>
-                    <TableCell align="right">Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -190,15 +189,10 @@ const EventRegistrationList: React.FC = () => {
                       <TableCell>{registration.userName}</TableCell>
                       <TableCell>{registration.eventName}</TableCell>
                       <TableCell>{new Date(registration.registrationDate).toLocaleDateString()}</TableCell>
-                      <TableCell>{registration.packageName}</TableCell>
+                      <TableCell>{registration.pacakageName}</TableCell>
                       <TableCell>{`R ${registration.amount.toFixed(2)}`}</TableCell>
                       <TableCell>
                         {registration.isPaid ? <Typography color="green">Paid</Typography> : <Typography color="red">Unpaid</Typography>}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Button variant="outlined" color="primary" onClick={() => handleViewDetails(registration.id)}>
-                          View Details
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

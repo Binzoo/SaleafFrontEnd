@@ -28,11 +28,12 @@ const AppListDonations = Loadable(lazy(() => import('pages/apps/donations/ListDo
 const AppBankInfo = Loadable(lazy(() => import('pages/apps/banking-info/BankingInformation')));
 
 const ManualPayment = Loadable(lazy(() => import('pages/apps/manual-payments/ListManualPayment')));
-const Calendar = Loadable(lazy(() => import('pages/apps/calendar')));
+// const Calendar = Loadable(lazy(() => import('pages/apps/calendar')));
 const CreateAdmin = Loadable(lazy(() => import('pages/apps/createAdmin/CreateAdmin')));
 const ListBursaryApplication = Loadable(lazy(() => import('pages/apps/bursayapplicaiton/BursaryApplicationList')));
 const EventRegistrationList = Loadable(lazy(() => import('pages/apps/eventRegistration/EventRegistration')));
 const StudentMarkList = Loadable(lazy(() => import('pages/apps/studentMarkList/StudentMarkList')));
+const ListAllAdmins = Loadable(lazy(() => import('pages/apps/createAdmin/ListAdmin')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -78,7 +79,6 @@ const MainRoutes = {
                 }
               ]
             },
-            { path: 'calendar', element: <Calendar />, loader: eventListLoader },
             {
               path: 'directors',
               children: [
@@ -163,6 +163,16 @@ const MainRoutes = {
                 {
                   path: 'studentMarkList',
                   element: <StudentMarkList />,
+                  loader: eventListLoader
+                }
+              ]
+            },
+            {
+              path: 'list-admin',
+              children: [
+                {
+                  path: 'list-admin',
+                  element: <ListAllAdmins />,
                   loader: eventListLoader
                 }
               ]

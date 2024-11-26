@@ -73,7 +73,7 @@ export default function WidgetData() {
 
       {/* row 4 */}
       <Grid item xs={12} md={6}>
-        <Transactions />
+        {/* <Transactions /> */}
       </Grid>
       <Grid item xs={12} md={6} lg={3}>
         <PaymentHistory />

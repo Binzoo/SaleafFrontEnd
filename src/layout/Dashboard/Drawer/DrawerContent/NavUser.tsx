@@ -102,30 +102,8 @@ export default function UserList() {
             ...(!drawerOpen && { display: 'flex', justifyContent: 'flex-end' }),
             '& .MuiListItemSecondaryAction-root': { right: !drawerOpen ? 16 : -16 }
           }}
-        >
-          <ListItemAvatar>
-            <Avatar alt="Avatar" src={avatar1} sx={{ ...(drawerOpen && { width: 46, height: 46 }) }} />
-          </ListItemAvatar>
-          <ListItemText primary={user?.name} sx={{ ...(!drawerOpen && { display: 'none' }) }} secondary="UI/UX Designer" />
-        </ListItem>
+        ></ListItem>
       </List>
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{ 'aria-labelledby': 'basic-button' }}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <MenuItem onClick={handleLogout}>Logout</MenuItem>
-        <MenuItem component={Link} to="/apps/profiles/user/personal" onClick={handleClose}>
-          Profile
-        </MenuItem>
-        <MenuItem component={Link} to="/apps/profiles/account/basic" onClick={handleClose}>
-          My account
-        </MenuItem>
-      </Menu>
     </Box>
   );
 }
